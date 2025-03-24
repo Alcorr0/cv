@@ -69,6 +69,13 @@ body {
 #content #page-0 {
 	top: calc(20% - 40px);
 }
+a, a:visited {
+	color: #fff;
+	text-decoration: none;
+}
+a:hover {
+	text-decoration: underline;
+}
 
 @media screen and (max-width: 900px) {
 	.pages {
