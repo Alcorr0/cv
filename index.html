@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>curve</title>
+	<link rel="stylesheet" type="text/css" href="styles.css" />
+</head>
+<body>
+	<pre id="text"></pre>
+	<h1 id="title"></h1>
+	<div id="content">
+		
+		<!-- Olexandr Kazanskyi -->
+		<div id="page-0" class="pages">
+			E-post: sashaalex2002@ukr.net
+			Telefon: +4796693362
+			Adresse: Kamhaugveien 16, 7160 Bjugn
+			Fødselsdato: 23. juli 2002
+		</div>
+		
+		<!-- Sammendrag -->
+		<div id="page-1" class="pages">
+			Jeg er en positiv, motivert og nyutdannet mann på jakt etter drømmejobben. Jeg takler stress godt, har åpen sinn og lærer veldig raskt. Jeg er løsningsorientert, kreativ, vennlig, hjelpsom og kan jobbe både alene og i team. Jeg har bred kunnskap innen naturvitenskap, men jeg har spesialisert meg i fysikk og programmering.
+		</div>
+		
+		<!-- Utdanning -->
+		<div id="page-2" class="pages">
+			<div class="row">
+				<div class="col">Juli 2019 - Januar 2025</div>
+				<div class="col">
+					V. N. Karazin Kharkiv Nasjonalt Universitet, Ukraina
+
+					<b>Radiofysiker, mastergrad i fysikk</b>
+
+					Kvanteradiofysikk, antennemodellering, mikrobølgefysikk, radioastronomi, ionosfærisk fysikk, ionosfærisk sondering, arkitektur av analog radiosendesystemer, datasystemer.
+				</div>
+			</div>
+			<hr>
+			<div class="row">
+				<div class="col">August 2024 - Februar 2025</div>
+				<div class="col">
+					Ørland voksenopplæring
+					Norskkurs
+					6 måneder
+				</div>
+			</div>
+		</div>
+		
+		<!-- Erfaring -->
+		<div id="page-3" class="pages">
+			<b>Webutvikler, webdesigner, mikrokontroller programmerer, reparatør, elektriker</b>
+
+			<hr>
+			
+			Utvikling av nettsider og mobilapplikasjoner;
+			Utvikling av systemer basert på mikrokontrollere i atmega-, esp8266- og esp32-serier;
+			Anvendelse av GPU og generative teknologier i webdesign;
+			Utvikling av nettmarkedsplasser;
+			Kjent med slike programmeringsspråk som Python, Java, C++, JS og Dart.
+			Kjent med Flutter og Wordpress.
+			Reparasjon av datamaskiner og periferiutstyr;
+			Montering og reparasjon av elsykler.
+		</div>
+		
+		<!-- Språk -->
+		<div id="page-4" class="pages">
+			
+			<b>Norsk</b>
+			Skriftlig: Godt
+			Muntlig: Mellomnivå
+
+			<hr>
+
+			<b>Engelsk</b>
+			Skriftlig: Godt
+			Muntlig: Godt
+
+			<hr>
+			
+			<b>Ukrainsk</b>
+			Skriftlig: Førstespråk (morsmål)
+			Muntlig: Førstespråk (morsmål)
+
+			<hr>
+			
+			<b>Russisk</b>
+			Skriftlig: Førstespråk (morsmål)
+			Muntlig: Førstespråk (morsmål)
+		</div>
+	</div>
+
+
+	<script type="text/javascript" src="gpu-browser.min.js"></script>
+	<script src="https://code.jquery.com/jquery-3.6.0.js"></script>
+	<script src="https://code.jquery.com/ui/1.13.0/jquery-ui.js"></script>
+	<script type="text/javascript" src="main.js"></script>
+	<script type="text/javascript" id="script">
+	//init
+		const gpu  = new GPU({ mode: 'gpu' });
+		const text = document.getElementById("script").innerHTML.replaceAll( '\n\t','\n' ).replaceAll( '\t','    ' );
+		const pre  = document.getElementById("text");
+	//get window dimensions
+		const win_width  = Math.floor(window.innerWidth/7),
+			  win_height = Math.floor(window.innerHeight/15);
+	//get text dimensions
+		var rows = text.split("\n");
+		const height = rows.length;
+		var max = 0;
+		for (var i = 0; i < height; i++) {
+			const len = rows[i].length; if (len > max) max = len;
+			rows[i] = rows[i].split('');
+		}
+		const width  = max;
+	//cursor coords
+		var cursor_position = [window.innerWidth/width/2,window.innerHeight/height/2];
+		var cursor_velocity = [0,0];
+		var cursor = cursor_position;
+		document.addEventListener('mousemove', function(e) { cursor_position = [e.clientX/width,
+		                                                                        e.clientY/height] }, false);
+	//rotate vector
+		gpu.addFunction(function rotate(vec, a) {
+			return [ Math.cos(a)*vec[0]-Math.sin(a)*vec[1],	 Math.sin(a)*vec[0]+Math.cos(a)*vec[1] ];
+		}, { argumentTypes: { vec: 'Array(2)',a: 'Number' },	returnType: 'Array(2)' });
+	//get space (where the magic begins)
+		const getUv = gpu.createKernel(function(t,c) {
+			var uv = [this.thread.x,this.thread.y];
+		//normalize cursor cords
+			var cursor = [ c[0]*16,
+			               c[1]*4.4 ];
+		//translate zero to center
+			uv[0] -= cursor[0];//this.constants.width /2;
+			uv[1] -= cursor[1];//this.constants.height/2;
+		//rotate depending on distance to center
+			const len = Math.pow(Math.pow(uv[0],2)+Math.pow(uv[1],2),0.5);
+			const win_len = Math.pow(Math.pow(this.constants.width,2)+Math.pow(this.constants.height,2),0.5);
+			uv = rotate(uv,len*(Math.sin(t)-Math.sin(t*3)/3)*Math.PI*2/win_len);
+		//return zero to top left corner
+			uv[0] += cursor[0];//this.constants.width /2;
+			uv[1] += cursor[1];//this.constants.height/2;
+
+		//repeat space
+			uv[0] = Math.round(uv[0])%this.constants.width;  if(uv[0]<0) uv[0]+=this.constants.width;
+			uv[1] = Math.round(uv[1])%this.constants.height; if(uv[1]<0) uv[1]+=this.constants.height;
+			return uv;
+		}, { constants: {width:width,height:height}, output: [win_width,win_height] });
+	//cycle
+		var t = 0;
+		const doDraw = () => {
+			const uv = getUv(t++ / 100, cursor);
+		//cursor physics
+			cursor_velocity[0]+=cursor_position[0]-cursor[0]; cursor_velocity[0]*=0.5; cursor[0]+=cursor_velocity[0]/30;
+			cursor_velocity[1]+=cursor_position[1]-cursor[1]; cursor_velocity[1]*=0.5; cursor[1]+=cursor_velocity[1]/30;
+		//get text by new space
+			var new_text = "";
+			for     (var y = 0; y < win_height; y++) { var row = "";
+				for (var x = 0; x < win_width;  x++) { var c;
+					const cords = uv[y][x], nx = cords[0],
+					                        ny = cords[1];
+					if (nx < rows[ny].length) c = rows[ny][nx];
+					else					  c = " ";
+					row += c;
+				}
+				new_text += row+'\n';
+			}
+			pre.innerText = new_text;
+			setTimeout(doDraw,50);
+		};
+		doDraw();
+	</script>
+</body>
+</html>
