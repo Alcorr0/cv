@@ -35,8 +35,8 @@ var startAnim = () => {
 	jQuery("#text").animate({
 		// fontSize: "10px",
 		// lineHeight: "13px",
-		backgroundColor: "#228",//#000
-		color: "#4c4"//#555
+		backgroundColor: "#171758",//#228//#000
+		color: "#226a22"//#4c4//#555
 	}, 500);
 	jQuery("#title").animate({
 		color: "#fff",
@@ -44,6 +44,7 @@ var startAnim = () => {
 	}, 500);
 	jQuery("#content").slideDown(500);
 	jQuery("#title").delay(400).css("text-shadow","none");
+	jQuery("#arrow").delay(400).show(500);
 	startAnim = () => {};
 };
 titleIter();
@@ -56,6 +57,8 @@ function smoothstep(a,b,c) {
 	return (b-a)*k + a;
 }
 document.addEventListener("scroll", (event) => {
+	if(jQuery("#arrow").is(":visible")) jQuery("#arrow").hide(200);
+
 	var h = document.documentElement, 
 		b = document.body,
 		st = 'scrollTop',
