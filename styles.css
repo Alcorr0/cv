@@ -73,10 +73,10 @@ body {
 }
 a, a:visited {
 	color: #fff;
-	text-decoration: none;
+	text-decoration: underline;
 }
 a:hover {
-	text-decoration: underline;
+	text-decoration: none;
 }
 
 #arrow {
