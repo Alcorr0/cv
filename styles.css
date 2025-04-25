@@ -8,7 +8,7 @@ body {
 	position: fixed;
 	top: 0;
 	left: 0;
-	z-index: -1;
+	z-index: 1;
 
 	margin: 0;
 	width: 100%;
@@ -49,6 +49,7 @@ body {
 #content {
 	display: none;
 	height: calc(100% * 5);
+	z-index: 0;
 }
 #content .pages {
 	width: 50%;
@@ -64,7 +65,8 @@ body {
 	border-radius: 20px;
 	padding: 50px;
 	box-sizing: border-box;
-	white-space: pre-line
+	white-space: pre-line;
+	z-index: 2;
 }
 #content #page-0 {
 	top: calc(20% - 40px);
@@ -87,6 +89,7 @@ a:hover {
 	background-color: #000c;
 	border-radius: 50%;
 	transform: translate(-50%, 50%);
+	z-index: 3;
 }
 #arrow:after {
 	content: '';
